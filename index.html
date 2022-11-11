@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"content="width=device-width,initial-scale=1">
+<title>赤谷六軒町線時刻表示アプリ</title>
+</head>
+<body>
+<h1 style="text-align: center">赤谷六軒町線<br>時刻検索アプリ</h1>
+<p style="text-align: center" for="start">出発地を選択してください</p>
+<select name="start" id="start" style="display: block; margin: auto;"></select>
+<p style="text-align: center" for="goal"><br>到着地を選択してください</p>
+<select name="goal" id="goal" style="display: block; margin: auto"></select>
+<p style="text-align: center" for="hour">時刻</p>
+<!--　inline要素を囲んでいるdivやpなどのブロック要素にtext-alignをつけて指定している　-->
+<div style="text-align: center;">
+    <select name="hour" id="hour" style="display: inline;"></select>:
+    <select name="minute" id="minute" style="display: inline;"></select>
+</div> <br>
+<form id="SorG">
+    <div style="text-align: center">
+        <input type = "radio" name = "StartorGoal" id="SorG" value = "出発" style="display: inline;">出発
+        <input type = "radio" name = "StartorGoal" id="SorG" value = "到着" style="display: inline;">到着
+    </div>
+</form> <br>
+<button type=”button” style="display: block; margin: auto" onclick="DisplayAlert()">検索</button>
+<p id = "result1" style="text-align: center"></p>
+<p id = "result2" style="text-align: center"></p>
+<script>
+
+const busstoplist = ["赤谷六軒町","赤谷連絡所","赤谷","不動橋","赤谷車庫前","中々山","山内","下山内","小戸","小戸下","小戸入口","大槻","米倉","米倉江口道","丑首","内竹口","天の原","五十公野団地前","七軒町","東中学校前","五十公野支所前","五十公野","杉原","新発田地域振興局","新発田高校前","新発田駅","駅前通","中央町","大栄町","諏訪神社前","新発田営業所"]
+const timelist1 = [719,719,723,724,725,727,729,729,735,736,738,739,741,741,743,744,745,746,747,747,748,749,750,751,752,756,757,759,800,802,816]
+const timelist2 = [825,825,829,830,831,833,835,835,841,842,844,845,847,847,849,850,851,852,853,853,854,855,856,857,858,902,903,905,906,908,922]
+const timelist3 = [1316,1316,1320,1321,1322,1324,1326,1326,1332,1333,1335,1336,1338,1338,1340,1341,1342,1343,1344,1344,1345,1346,1347,1348,1349,1353,1354,1356,1357,1359,1413]
+const timelist4 = [721,721,725,726,727,729,731,731,"―","―",734,735,737,737,739,740,741,742,743,743,744,745,746,747,748,752,753,755,756,758,812]
+const timelist5 = [1600,1600,1604,1605,1606,1608,1610,1610,"―","―",1613,1614,1616,1616,1618,1619,1620,1621,1622,1622,1623,1624,1625,1626,1627,1631,1632,1634,1635,1637,1651]
+const timelist6 = [1821,1821,1825,1826,1827,1829,1831,1831,"―","―",1834,1835,1837,1837,1839,1840,1841,1842,1843,1843,1844,1845,1846,1847,1848,1852,1853,1855,1856,1858,1912]
+const timelist7 = [1923,1923,1927,1928,1929,1931,1933,1933,"―","―",1936,1937,1939,1939,1941,1942,1943,1944,1945,1945,1946,1947,1948,1949,1950,1954,1955,1957,1958,2000,2014]
+
+
+//セレクトボックスにバス停を追加している
+for(let i = 0; i < 31; i++){
+    const selectStart = document.getElementById('start');
+    const selectGoal = document.getElementById('goal');
+    var option1 = document.createElement('option');
+    option1.value = i;
+    option1.textContent = busstoplist[i];
+    selectStart.appendChild(option1);
+    var option1 = document.createElement('option');
+    option1.value = i;
+    option1.textContent = busstoplist[i];
+    selectGoal.appendChild(option1);
+}
+
+//セレクトボックスに～時を追加している
+for(let i = 0; i < 24; i++){
+    const selectHour = document.getElementById('hour')
+    var option2 = document.createElement('option');
+    option2.value = i;
+    option2.textContent = i;
+    selectHour.appendChild(option2);
+}
+
+//セレクトボックスに～分を追加している
+for(let i = 0; i < 60; i++){
+    const selectMinute = document.getElementById('minute');
+    var option3 = document.createElement('option');
+    option3.value = i;
+    option3.textContent = i;
+    selectMinute.appendChild(option3);
+}
+
+//aは出発の時刻　bは到着の時刻　cは出発バス停の番号　dは到着バス停の番号
+function answer(a,b,c,d) {
+    //長さを調べるためにStringをつかって文字列に変換している
+    if(String(a).length == 4){
+        var tookH = String(a).slice(0,2)
+        var tookM = String(a).slice(2,4)
+        var Stime = tookH + ":" + tookM
+        tookH = String(b).slice(0,2)
+        tookM = String(b).slice(2,4)
+    } else {
+        var tookH = String(a).slice(0,1)
+        var tookM = String(a).slice(1,3)
+        var Stime = tookH + ":" + tookM
+        tookH = String(b).slice(0,1)
+        tookM = String(b).slice(1,3)
+    }
+    var Gtime = tookH + ":" + tookM
+    //検索結果を表示する
+    document.getElementById("result1").textContent = "出発　" + busstoplist[c] + "　" + Stime 
+    document.getElementById("result2").textContent = "到着　" + busstoplist[d] + "　" + Gtime 
+}
+
+
+function DisplayAlert() {
+    var start = document.getElementById('start')
+    // 値(数値)を取得
+	var num1 = start.selectedIndex;
+	// 値(数値)から値(value値)を取得
+	var str1 = start.options[num1].textContent;
+
+    var goal = document.getElementById('goal')
+    // 値(数値)を取得
+	var num2 = goal.selectedIndex;
+	// 値(数値)から値(value値)を取得
+	var str2 = goal.options[num2].textContent;
+
+    var hour = document.getElementById('hour')
+    // 値(数値)を取得
+	var num3 = hour.selectedIndex;
+	// 値(数値)から値(value値)を取得
+	var str3 = hour.options[num3].textContent;
+
+    var minute = document.getElementById('minute')
+    // 値(数値から)を取得
+    var num4 = minute.selectedIndex;
+    // 値(数値から)値(value値)を取得
+
+    var element = document.getElementById('SorG')
+
+    var str4 = minute.options[num4].textContent;
+    //form要素を取得
+    var RadioNodeList = element.StartorGoal;
+    //aに出発か到着かをいれる
+    var a = RadioNodeList.value;
+
+    if (a === "出発"){
+        //分が一桁なら分の前に0を追加する
+        if (num4 < 10) {
+            num4 = "0" + String(num4)
+        }
+        //hmに時間の後に分を追加したものを入れる　例11+23=1123
+        var hm = String(num3) + String(num4)
+        //通過するバス停が含まれていた場合
+        if (num1 == 8 || num1 == 9 || num2 == 8 || num2 == 9){
+            //通過しない時間帯の路線だけで計算している
+            if(hm < timelist1[num1]) {
+                //answerという関数に出発時間、到着時間、バス停の番号を送っている
+                answer(timelist1[num1],timelist1[num2],num1,num2)
+            } else if (hm < timelist2[num1]) {
+                answer(timelist2[num1],timelist2[num2],num1,num2)
+            } else if (hm < timelist3[num1]) {
+                answer(timelist3[num1],timelist3[num2],num1,num2)
+            } else {
+                document.getElementById("result").textContent = "指定の時間後に出発するバスはありません"
+            }
+        //時刻表を早い順に調べている
+        } else if (hm < timelist1[num1]) {
+            answer(timelist1[num1],timelist1[num2],num1,num2)
+
+        } else if (hm < timelist4[num1]) {
+            answer(timelist4[num1],timelist4[num2],num1,num2)
+
+        } else if (hm < timelist2[num1]) {
+            answer(timelist2[num1],timelist2[num2],num1,num2)
+        
+        } else if (hm < timelist3[num1]) {
+            answer(timelist3[num1],timelist3[num2],num1,num2)
+
+        } else if (hm < timelist5[num1]) {
+            answer(timelist5[num1],timelist5[num2],num1,num2)
+            
+        } else if (hm < timelist6[num1]) {
+            answer(timelist6[num1],timelist6[num2],num1,num2)
+
+        } else if (hm < timelist7[num1]) {
+            answer(timelist7[num1],timelist7[num2],num1,num2)
+        //指定時刻の方が最後の時刻より遅かったなら    
+        } else {
+            document.getElementById("result").textContent = "指定の時間後に出発するバスはありません"
+        }
+    }
+
+
+    if(a==="到着"){
+        //分が一桁なら分の前に0を追加する
+        if(num4 < 10){
+            num4 = "0" + String(num4)
+        }
+        //hmに時間の後に分を追加したものを入れる　例11+23=1123
+        var hm = String(num3) + String(num4)
+        //通過するバス停が含まれていた場合
+        if (num1 == 8 || num1 == 9 || num2 == 8 || num2 == 9){
+        //通過しない時間帯の路線だけで計算している
+            if (hm > timelist3[num2]) {
+                //answerという関数に出発時間、到着時間、バス停の番号を送っている
+                answer(timelist3[num1],timelist3[num2],num1,num2)
+
+            } else if (hm > timelist2[num2]) {
+                answer(timelist2[num1],timelist2[num2],num1,num2)
+
+            } else if (hm > timelist1[num2]) {
+                answer(timelist1[num1],timelist1[num2],num1,num2)
+
+            } else document.getElementById("result").textContent = "指定の時間前に到着するバスはありません"
+
+        //時刻表が遅い順に調べる
+        } else if(hm > timelist7[num2]) {
+            answer(timelist7[num1],timelist7[num2],num1,num2)
+
+        } else if (hm > timelist6[num2]) {
+            answer(timelist6[num1],timelist6[num2],num1,num2)
+
+        } else if (hm > timelist5[num2]) {
+            answer(timelist5[num1],timelist5[num2],num1,num2)
+
+        } else if (hm > timelist3[num2]) {
+            answer(timelist3[num1],timelist3[num2],num1,num2)
+
+        } else if (hm > timelist2[num2]) {
+            answer(timelist2[num1],timelist2[num2],num1,num2)
+        
+        } else if (hm > timelist4[num2]) {
+            answer(timelist4[num1],timelist4[num2],num1,num2)
+
+        } else if (hm > timelist1[num2]) {
+            answer(timelist1[num1],timelist1[num2],num1,num2)
+                
+        } else {
+            document.getElementById("result").textContent = "指定の時間前に到着するバスはありません"
+        }
+    }
+}
+</script>
+</body>
+</html>
