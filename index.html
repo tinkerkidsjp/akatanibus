@@ -144,8 +144,10 @@ function DisplayAlert() {
         }
         //hmに時間の後に分を追加したものを入れる　例11+23=1123
         var hm = String(num3) + String(num4)
+	if (num1 > num2) {
+            alert("検索できません")
         //通過するバス停が含まれていた場合
-        if (num1 == 8 || num1 == 9 || num2 == 8 || num2 == 9){
+        } else if (num1 == 8 || num1 == 9 || num2 == 8 || num2 == 9){
             //通過しない時間帯の路線だけで計算している
             if(hm < timelist1[num1]) {
                 //answerという関数に出発時間、到着時間、バス停の番号を送っている
@@ -192,8 +194,10 @@ function DisplayAlert() {
         }
         //hmに時間の後に分を追加したものを入れる　例11+23=1123
         var hm = String(num3) + String(num4)
+	if (num1 > num2) {
+            alert("検索できません")
         //通過するバス停が含まれていた場合
-        if (num1 == 8 || num1 == 9 || num2 == 8 || num2 == 9){
+	} else if (num1 == 8 || num1 == 9 || num2 == 8 || num2 == 9){
         //通過しない時間帯の路線だけで計算している
             if (hm > timelist3[num2]) {
                 //answerという関数に出発時間、到着時間、バス停の番号を送っている
